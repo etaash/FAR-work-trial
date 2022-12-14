@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{graphicx}
 \author{Etaash Katiyar}
 \title{FAR Work Trial}
 \begin{document}
@@ -34,19 +35,62 @@ Further, the indirect effect of intervening on the intermediate attentions and M
 
 It is found that there are distinctly two locations for facts, in the earlier layers of the transformer at the last subject token of the fact, and at the later transformer layers  at the last token of the input. 
 Further, the earlier and later 'sites' decompose fairly cleanly into the indirect effects of the MLP contributions and the attention contributions, respectively.
-These results are observed over a variety of large transformer models, as seen in the appendix.\\
+These results are observed over a variety of large transformer models, as seen in the appendix of the paper.
+\\
 These observations are used to develop a technique to edit the facts stored in a transformer.
 This method interesting on its own, but its efficacy also provides justification for the extracted fact locations. 
 The MLP contributions are interpreted as linear associative memory, mapping input 'key' vectors to 'value vectors, and the edit method follows from this interpretation.
 A new fact, represented by a new key value pair is formulated. The paper presents a method to formulate a new key value pair representing the new, edited fact.
-The new key value pair is inserted into the network through an intuitive constrained optimization of weights of the intermediate MLP concerned.
+The new key value pair is inserted into the network through an intuitive constrained optimization of weights of the intermediate MLP.
 \\
-The results of the edits are evaluated on various metrics 
-[ insert various metrics and their discussion ]
 
 
 \subsection{Experiment in extracting locations of sentiment}
-We propose an experiment 
+% experimental setup
+% graphs
+% findings
+% limitations
 
+We propose an experiment to extract the location of sentiment in a transformer model, in a similar vein to the ROME paper. 
+
+The transformer model (GPT-2) is used to classify sentiment. We append the text ' I am feeling' to the end of tweet text. Then, we run inference on the transformer and track the probabilities of the words 'good' and 'bad'.
+Using a dataset of twitter tweets annotated with sentiment, we train a logistic regression classifier to predict the sentiment from these two probabilities. 
+\\
+Then, we use the output of the logistic regression as a proxy of the target we are interested in, namely the sentiment as predicted by the transformer. We then run clean inference, corrupted, and corrupted-with-patch runs of the transformer, and tracking the treatment effect on the sentiment proxy.
+\\
+Figures 1, 2, and 3 depict the effect of patching certain layers of the transformer on the proxy for sentiment. We observe an earlier and later site for the location. Further, these sites separate into attention and MLP effects as expected from the ROME paper. However, for longer inputs, the earlier site is not as distinct as in the ROME paper at the last input word of the subject.  
+
+\begin{figure}[h]
+
+\centering
+\includegraphics{toy_statement_trace1.png}
+\caption{Toy statement causal trace}
+
+\end{figure}
+
+\begin{figure}[h]
+
+\centering
+\includegraphics{toy_statement_trace2}
+\caption{Toy statement causal trace (MLP}
+
+\end{figure}
+
+
+\begin{figure}[h]
+
+\centering
+\includegraphics{toy_statement_trace3}
+\caption{Toy statement causal trace (attn)}
+
+\end{figure}
+
+\textbf{Limitations}
+More evidence is needed to determine how well this extracts the location of sentiment, and whether or not we are picking up certain erroneous artifacts. Attempting to edit the transformer's sentiment extraction could be useful for this purpose.
+\\
+Further, the proxy for sentiment is quite noisy, achieving only about 73\% accuracy. More work can be done to build a better proxy, perhaps by using the last hidden state of the transformer to predict sentiment. 
+\\
+Further, this method is quite slow for longer input sequences. 
+\\
 
 \end{document}
